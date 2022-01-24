@@ -1,11 +1,11 @@
 # number of boys and girls
-girls_num = 0
-boys_num = 0
+boys_num = int(input('Enter number of boys: '))
+girls_num = int(input('Enter number of girls: '))
 
 # lists for saving their prefre
 girls = []
 boys = []
-relation = []
+relation = [[] for x in range(girls_num)]
 
 
 # show index of boys in order ascending
@@ -25,21 +25,31 @@ class Boy:
         self.order = sort_girls(girls_order)
         self.state = 0
 
-    def compare_boys(self, g1, g2):
+    def compare_girls(self): #we should use another array for girls-opt
+        tmp = -1
+        for i in self.order:
+            if i in relation[self.x]:
+                tmp = i
+                break
+        
+        for i in relation[self.x]:
+            if i != tmp:
+                boys[i].reject()
 
-        for i in range(self.order):
-            if i == g1:
-                return 0
-            elif i == g2:
-                return 1
-            else:
-                return -1
+            relation[self.x].remove(i)
+        
+        relation[self.x].append(tmp)
     
     def choose_girl(self):
         return self.order[0]
     
     def reject(self):
-        self.order.pop(0)
+        tmp = self.order.pop(0)
+        self.state = 0
+    
+    def request(self):
+        self.state = 1
+        relation[self.choose_girl()].append(self.x)
 
 
 class Girl:
@@ -49,15 +59,21 @@ class Girl:
         self.order = sort_boys(boys_order)
         self.state = 0 # in relation or not
     
-    def compare_boys(self, b1, b2):
+    def compare_boys(self):
+        tmp = -1
+        for i in self.order:
+            if i in relation[self.x]:
+                tmp = i
+                break
+        
+        for i in relation[self.x]:
+            if i != tmp:
+                boys[i].reject()
 
-        for i in range(self.order):
-            if i == b1:
-                return 0
-            elif i == b2:
-                return 1
-            else:
-                return -1
+            relation[self.x].remove(i)
+        
+        relation[self.x].append(tmp)
+
     
     def choose_boy(self):
         return self.order[0]
@@ -66,35 +82,21 @@ class Girl:
         self.order.pop(0)
 
 
-def choose_boy(b1, b2, g):
-
-    if(girls[g].compare_boys(b1, b2)):
-        boys[b1].reject()
-        boys[b1].state = 0
-        relation[g].append(b2)
-        return 1
-    
-    else:
-        return 0
-
-
-def request(b):
-    relation[b.choose_girl()].append(b)
-
-
 def stable_conditon():
-    for i in relation:
-        if len(i) > 1:
-            return 0
+    for i in range(girls_num):
+        if len(relation[i]) > 1:
+            return i
     
-    return 1
+    return -1
+
+
+def show_result():
+    for i in range(girls_num):
+        print(f'boy {relation[i]} --> girl {i}')
+
 
 
 ############ main
-
-boys_num = int(input('Enter number of boys: '))
-girls_num = int(input('Enter number of girls: '))
-
 print('Enter boys prefrences')
 
 for i in range(boys_num):
@@ -110,7 +112,20 @@ for i in range(girls_num):
     girls.append(girl)
 
 
-while(stable_conditon() != 0):
-
-    for i in range(boys_num):
-        request(i)
+for ctr in range((boys_num * girls_num) + 1):
+    for i in boys:
+        if i.state == 0:
+            i.request()
+    
+    famouse_girl = stable_conditon()
+    # print("f_g", famouse_girl)
+    if(famouse_girl != -1):
+        # print('im here')
+        # for k in range(girls_num):
+            # print(f'{relation[k]}-{k}')
+        girls[famouse_girl].compare_boys()
+    
+    else:
+        print(ctr)
+        show_result()
+        break
