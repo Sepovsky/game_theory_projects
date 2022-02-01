@@ -65,7 +65,7 @@ def matching(boy_optimal):
                 print(f'Boy {relations[i][0]+1} <--> Girl {i+1}')
         else:
             for i in range(proposees_count):
-                print(f'Girl {relations[i][0]+1} <--> Boy {i+1}')
+                print(f'Boy {i+1} <--> Girl {relations[i][0]+1}')
 
 
     proposers = []
@@ -123,6 +123,7 @@ for i in range(len(boy_opt)):
         flag = 0
         break
 
+print()
 if flag:
     print("it is a unique stable matching. :))")
 else:
